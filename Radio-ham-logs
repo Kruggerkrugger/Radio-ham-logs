@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>26DD102 - Radio Ham & Scanner Hobby</title>
+  <style>
+    :root {
+      --bg-color: #f4f4f9;
+      --text-color: #333;
+      --card-bg: #fff;
+      --header-bg: #222;
+      --nav-bg: #444;
+    }
+    [data-theme="dark"] {
+      --bg-color: #181818;
+      --text-color: #eee;
+      --card-bg: #242424;
+      --header-bg: #111;
+      --nav-bg: #333;
+    }
+    body { font-family: Arial, sans-serif; margin: 0; background: var(--bg-color); color: var(--text-color); transition: all 0.3s ease; }
+    header { background: var(--header-bg); color: #fff; padding: 20px; text-align: center; }
+    header h1 { margin: 0; }
+    #clock { font-size: 1.2em; margin-top: 5px; color: #ffcc00; }
+    nav { background: var(--nav-bg); padding: 10px; text-align: center; }
+    nav a { color: white; margin: 0 15px; text-decoration: none; font-weight: bold; }
+    .theme-toggle { background: #666; color: #fff; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; margin-left: 20px; }
+    section { padding: 20px; max-width: 900px; margin: auto; background: var(--card-bg); margin-top: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    h2 { border-bottom: 2px solid #eee; padding-bottom: 5px; color: var(--text-color); cursor: pointer; }
+    .content { display: none; margin-top: 10px; }
+    .active .content { display: block; }
+    footer { background: var(--header-bg); color: #fff; text-align: center; padding: 15px; margin-top: 30px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    table, th, td { border: 1px solid #ccc; }
+    th, td { padding: 8px; text-align: center; }
+    form { margin-top: 15px; display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+    input, select, button { padding: 8px; border: 1px solid #ccc; border-radius: 5px; font-size: 1em; }
+    button { background: #444; color: white; cursor: pointer; }
+    button:hover { background: #666; }
+    @media (max-width: 600px) { nav a { display: block; margin: 10px 0; } .theme-toggle { margin: 10px 0; } }
+  </style>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+
+<header>
+  <h1>26DD102 - Gary Maddison</h1>
+  <p>Boston, Lincolnshire, England</p>
+  <div id="clock">Loading UTC time...</div>
+</header>
+
+<nav>
+  <a href="#qsl">QSL Info</a>
+  <a href="#logs">Logs</a>
+  <a href="#scanner">Scanner Hobby</a>
+  <a href="#contact">Contact</a>
+  <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
+</nav>
+
+<section id="qsl" class="collapsible">
+  <h2 onclick="toggleSection(this)">QSL Information</h2>
+  <div class="content">
+    <p>Mode: 11M SSB<br>Grid Locator: JO02<br>QSL via: eQSL & Direct</p>
+  </div>
+</section>
+
+<section id="logs" class="collapsible">
+  <h2 onclick="toggleSection(this)">Recent Logs</h2>
+  <div class="content">
+    <table id="logTable">
+      <tr><th>Date</th><th>Callsign</th><th>Frequency</th><th>Mode</th><th>RST</th><th>Actions</th></tr>
+    </table>
+
+    <form id="logForm">
+      <input type="date" id="date" required>
+      <input type="text" id="callsign" placeholder="Callsign" required>
+      <input type="text" id="frequency" placeholder="Frequency" required>
+      <select id="mode">
+        <option value="SSB">SSB</option>
+        <option value="AM">AM</option>
+        <option value="FM">FM</option>
+        <option value="CW">CW</option>
+      </select>
+      <input type="text" id="rst" placeholder="RST" required>
+      <button type="submit">Add Log</button>
+    </form>
+  </div>
+</section>
+
+<section id="scanner" class="collapsible">
+  <h2 onclick="toggleSection(this)">Scanner Hobby</h2>
+  <div class="content">
+    <p>I enjoy monitoring local airband, marine, and PMR frequencies. Favourite bands include 118–137 MHz (airband) and 156–162 MHz (marine VHF).</p>
+  </div>
+</section>
+
+<section id="contact" class="collapsible">
+  <h2 onclick="toggleSection(this)">Contact</h2>
+  <div class="content">
+    <p>Email: <a href="mailto:gary@example.com">gary@example.com</a></p>
+    <p>QSL: via eQSL or direct mail</p>
+  </div>
+</section>
+
+<footer>
+  <p>&copy; 2025 26DD102 - Radio Ham & Scanner Hobby</p>
+</footer>
+
+<script>
+  // Collapsible sections
+  function toggleSection(header) { header.parentElement.classList.toggle("active"); }
+
+  // Clock
+  function updateClock() { document.getElementById("clock").textContent = new Date().toUTCString().replace("GMT","UTC"); }
+  setInterval(updateClock,1000); updateClock();
+
+  // Theme persistence
+  const savedTheme = localStorage.getItem('theme');
+  if(savedTheme) document.body.setAttribute('data-theme', savedTheme);
+  function toggleTheme() {
+    if(document.body.getAttribute('data-theme')==='dark') { document.body.removeAttribute('data-theme'); localStorage.setItem('theme','light'); }
+    else { document.body.setAttribute('data-theme','dark'); localStorage.setItem('theme','dark'); }
+  }
+
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "XXXX",
+    appId: "XXXX"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const auth = firebase.auth();
+
+  let currentUserId = null;
+
+  // Anonymous login
+  auth.signInAnonymously().catch(console.error);
+  auth.onAuthStateChanged(user => {
+    if(user) {
+      currentUserId = user.uid;
+      loadLogsFromFirebase();
+    }
+  });
+
+  // Add log
+  document.getElementById("logForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    if(!currentUserId) return;
+    const log = {
+      date: document.getElementById("date").value,
+      callsign: document.getElementById("callsign").value,
+      frequency: document.getElementById("frequency").value,
+      mode: document.getElementById("mode").value,
+      rst: document.getElementById("rst").value
+    };
+    await db.collection('users').doc(currentUserId).collection('logs').add(log);
+    addLogRow(log);
+    document.getElementById("logForm").reset();
+  });
+
+  function addLogRow(log) {
+    const table = document.getElementById("logTable");
+    const row = table.insertRow(-1);
+    row.insertCell(0).innerText = log.date;
+    row.insertCell(1).innerText = log.callsign;
+    row.insertCell(2).innerText = log.frequency;
+    row.insertCell(3).innerText = log.mode;
+    row.insertCell(4).innerText = log.rst;
+    const actionsCell = row.insertCell(5);
+    actionsCell.innerText = "✅"; // Edit/Delete can be added with Firebase doc IDs
+  }
+
+  async function loadLogsFromFirebase() {
+    if(!currentUserId) return;
+    const snapshot = await db.collection('users').doc(currentUserId).collection('logs').orderBy('date','desc').get();
+    snapshot.forEach(doc => addLogRow(doc.data()));
+  }
+</script>
+
+</body>
+</html>
